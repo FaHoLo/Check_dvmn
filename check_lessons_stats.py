@@ -19,7 +19,7 @@ class SendToTelegramHandler(logging.Handler):
         message_max_length = 4096
 
         if text != 'Бот начал работу':
-            bot.send_message(chat_id, 'Бот упал с ошибкой:')
+            bot.send_message(chat_id, 'Бот встретился с ошибкой:')
         if len(text) <= message_max_length:
             return bot.send_message(chat_id, text)
 
