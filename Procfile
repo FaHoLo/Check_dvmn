@@ -1,0 +1,1 @@
+bot: python3 check_lessons_stats.py
