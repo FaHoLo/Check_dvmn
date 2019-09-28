@@ -1,5 +1,4 @@
 import os
-import time
 import logging
 import requests
 import telegram
@@ -19,13 +18,11 @@ class SendToTelegramHandler(logging.Handler):
         bot = telegram.Bot(token=tg_bot_token)
         message_max_length = 4096
 
-        if text != 'Бот начал работу':
-            bot.send_message(chat_id, 'Бот встретился с ошибкой:')
         if len(text) <= message_max_length:
             return bot.send_message(chat_id, text)
 
         parts = []
-        while len(text) > 0:
+        while text:
             if len(text) <= message_max_length:
                 parts.append(text)
                 break    
@@ -40,7 +37,6 @@ class SendToTelegramHandler(logging.Handler):
 
         for part in parts:
             bot.send_message(chat_id, part)
-            time.sleep(1)  
 
 def main():
     load_dotenv()
@@ -49,7 +45,7 @@ def main():
 def check_lessons_stats():
     logger = customize_logger()
     search_start_time = get_last_check_time()
-    logger.error('Бот начал работу')
+    logger.info('Бот начал работу')
     while True:
         try:
             response = make_long_polling_request(search_start_time)
@@ -58,6 +54,7 @@ def check_lessons_stats():
         except requests.exceptions.ConnectionError:
             continue
         except Exception:
+            logger.info('Бот встретился с ошибкой:')
             logger.exception('')
             continue
         if response['status'] == 'found':
@@ -69,6 +66,7 @@ def check_lessons_stats():
 def customize_logger():
     logger = logging.getLogger()
     logger.addHandler(SendToTelegramHandler())
+    logger.setLevel('INFO')
     return logger
 
 def get_last_check_time():    
