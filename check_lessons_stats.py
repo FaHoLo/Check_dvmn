@@ -3,6 +3,7 @@ import time
 import logging
 import requests
 import telegram
+from dotenv import load_dotenv
 
 
 class SendToTelegramHandler(logging.Handler):
@@ -42,6 +43,7 @@ class SendToTelegramHandler(logging.Handler):
             time.sleep(1)  
 
 def main():
+    load_dotenv()
     check_lessons_stats()
 
 def check_lessons_stats():
