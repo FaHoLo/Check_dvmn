@@ -54,7 +54,7 @@ def check_lessons_stats():
         except requests.exceptions.ConnectionError:
             continue
         except Exception:
-            logger.info('Бот встретился с ошибкой:')
+            logger.error('Бот встретился с ошибкой:')
             logger.exception('')
             continue
         if response['status'] == 'found':
@@ -66,7 +66,7 @@ def check_lessons_stats():
 def customize_logger():
     logger = logging.getLogger()
     logger.addHandler(SendToTelegramHandler())
-    logger.setLevel('INFO')
+    # logger.setLevel('INFO')
     return logger
 
 def get_last_check_time():    
