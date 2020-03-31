@@ -11,7 +11,6 @@ class SendToTelegramHandler(logging.Handler):
         log_entry = self.format(record)   
         self.send_error_log_to_telegram(log_entry)
 
-    #Code snippet from: https://github.com/python-telegram-bot/python-telegram-bot/issues/768
     def send_error_log_to_telegram(self, text):
         tg_bot_token = os.environ['TG_LOG_BOT_TOKEN']
         chat_id = os.environ['TG_CHAT_ID']
@@ -21,22 +20,27 @@ class SendToTelegramHandler(logging.Handler):
         if len(text) <= message_max_length:
             return bot.send_message(chat_id, text)
 
-        parts = []
-        while text:
-            if len(text) <= message_max_length:
-                parts.append(text)
-                break    
-            part = text[:message_max_length]
-            first_lnbr = part.rfind('\n')
-            if first_lnbr != -1:
-                parts.append(part[:first_lnbr])
-                text = text[first_lnbr+1:]
-            else:
-                parts.append(part)
-                text = text[message_max_length:]
-
+        parts = split_text_on_parts(text, message_max_length)
         for part in parts:
             bot.send_message(chat_id, part)
+
+
+def split_text_on_parts(text, message_max_length):
+    parts = []
+    while text:
+        if len(text) <= message_max_length:
+            parts.append(text)
+            break    
+        part = text[:message_max_length]
+        first_lnbr = part.rfind('\n')
+        if first_lnbr != -1:
+            parts.append(part[:first_lnbr])
+            text = text[first_lnbr+1:]
+        else:
+            parts.append(part)
+            text = text[message_max_length:]
+    return parts
+
 
 def main():
     load_dotenv()
