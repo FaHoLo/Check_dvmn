@@ -2,6 +2,7 @@ import os
 import logging
 import requests
 import telegram
+from time import sleep
 from dotenv import load_dotenv
 
 
@@ -58,8 +59,8 @@ def check_lessons_stats():
         except requests.exceptions.ConnectionError:
             continue
         except Exception:
-            logger.error('Бот встретился с ошибкой:')
             logger.exception('')
+            sleep(240)
             continue
         if response['status'] == 'found':
             send_notify_to_telegram(response['new_attempts'])
