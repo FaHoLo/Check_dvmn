@@ -102,10 +102,12 @@ def send_notify_to_telegram(attempts):
 def collect_message(attempt):
     lesson_title = attempt['lesson_title']
     lesson_url = 'https://dvmn.org{}'.format(attempt['lesson_url'])
+    status_value = '(+)'
     lesson_status = 'Работа сдана, можно приступать к следующему уроку:'
     if attempt['is_negative']:
         lesson_status = 'В работе нашлись ошибки, скорее исправляй:'
-    text = f'Проверена работа «‎{lesson_title}».\n\n{lesson_status}\n{lesson_url}'
+        status_value = '(-)'
+    text = f'{status_value}Проверена работа «‎{lesson_title}».\n\n{lesson_status}\n{lesson_url}'
     return text
 
 if __name__ == '__main__':
