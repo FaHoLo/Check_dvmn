@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 class SendToTelegramHandler(logging.Handler):
 
     def emit(self, record):
-        log_entry = self.format(record)   
+        log_entry = self.format(record)
         self.send_error_log_to_telegram(log_entry)
 
     def send_error_log_to_telegram(self, text):
@@ -31,7 +31,7 @@ def split_text_on_parts(text, message_max_length):
     while text:
         if len(text) <= message_max_length:
             parts.append(text)
-            break    
+            break
         part = text[:message_max_length]
         first_lnbr = part.rfind('\n')
         if first_lnbr != -1:
@@ -46,6 +46,7 @@ def split_text_on_parts(text, message_max_length):
 def main():
     load_dotenv()
     check_lessons_stats()
+
 
 def check_lessons_stats():
     logger = customize_logger()
@@ -68,19 +69,22 @@ def check_lessons_stats():
         else:
             search_start_time = response['timestamp_to_request']
 
+
 def customize_logger():
     logger = logging.getLogger()
     logger.addHandler(SendToTelegramHandler())
     # logger.setLevel('INFO')
     return logger
 
-def get_last_check_time():    
+
+def get_last_check_time():
     url = 'https://dvmn.org/api/user_reviews/'
     dvmn_token = os.environ['DVMN_TOKEN']
     headers = {'Authorization': f'Token {dvmn_token}'}
     response = requests.get(url, headers=headers)
     response.raise_for_status()
     return response.json()['results'][0]['timestamp']
+
 
 def make_long_polling_request(search_start_time):
     url = 'https://dvmn.org/api/long_polling/'
@@ -91,6 +95,7 @@ def make_long_polling_request(search_start_time):
     response.raise_for_status()
     return response.json()
 
+
 def send_notify_to_telegram(attempts):
     tg_bot_token = os.environ['TG_BOT_TOKEN']
     chat_id = os.environ['TG_CHAT_ID']
@@ -98,6 +103,7 @@ def send_notify_to_telegram(attempts):
     for attempt in attempts:
         text = collect_message(attempt)
         bot.send_message(chat_id, text, disable_web_page_preview=True)
+
 
 def collect_message(attempt):
     lesson_title = attempt['lesson_title']
@@ -109,6 +115,7 @@ def collect_message(attempt):
         status_value = '(-)'
     text = f'{status_value}Проверена работа «‎{lesson_title}».\n\n{lesson_status}\n{lesson_url}'
     return text
+
 
 if __name__ == '__main__':
     main()
