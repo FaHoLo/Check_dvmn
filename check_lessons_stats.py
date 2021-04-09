@@ -64,7 +64,7 @@ def check_lessons_stats():
             sleep(240)
             continue
         if response['status'] == 'found':
-            send_notify_to_telegram(response['new_attempts'])
+            send_notify_to_telegram(response['new_attempts'], response, search_start_time)
             search_start_time = response['last_attempt_timestamp']
         else:
             search_start_time = response['timestamp_to_request']
@@ -96,12 +96,14 @@ def make_long_polling_request(search_start_time):
     return response.json()
 
 
-def send_notify_to_telegram(attempts):
+def send_notify_to_telegram(attempts, response, search_start_time):
     tg_bot_token = os.environ['TG_BOT_TOKEN']
     chat_id = os.environ['TG_CHAT_ID']
     bot = telegram.Bot(token=tg_bot_token)
     for attempt in attempts:
-        text = collect_message(attempt)
+        text = f"{collect_message(attempt)}" \
+            f"\n\nResponse: {response}" \
+            f"\n\nStart time:{search_start_time}"
         bot.send_message(chat_id, text, disable_web_page_preview=True)
 
 
